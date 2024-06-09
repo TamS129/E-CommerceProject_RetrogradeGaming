@@ -1,5 +1,4 @@
 CREATE DATABASE retrogradeGaming;
-CREATE DATABASE retrogradeGaming;
 
 USE retrogradeGaming;
 
@@ -10,7 +9,9 @@ CREATE TABLE User (
     Email           VARCHAR(60)     NOT NULL,
     Password        VARCHAR(30)     NOT NULL,
     PhoneNumber     BIGINT,
+    
     CONSTRAINT user PRIMARY KEY(UserID),
+    
     CONSTRAINT validBirthDate CHECK (Birthday >= '1900-01-01')
 );
 
@@ -20,34 +21,37 @@ CREATE TABLE Product (
     Description     VARCHAR(60),
     Company         VARCHAR(30)     NOT NULL,
     YearOfRelease   YEAR            NOT NULL,
+    
     CONSTRAINT productInfo PRIMARY KEY(ProductID)
 );
 
 CREATE TABLE Review (
-    ReviewID        INT             NOT NULL AUTO_INCREMENT,
-    UserID          INT             NOT NULL,
-    ProductID       INT             NOT NULL,
-    Rating          INT             NOT NULL,
+    ReviewID          INT             NOT NULL AUTO_INCREMENT,
+    UserID            INT             NOT NULL,
+    ProductID         INT             NOT NULL,
+    Rating            INT             NOT NULL,
     ReviewDescription VARCHAR(100),
-    DatePosted      DATE            NOT NULL,
+    DatePosted        DATE            NOT NULL,
+    
     CONSTRAINT reviewInfo PRIMARY KEY(ReviewID),
+    
     CONSTRAINT reviewUserFK FOREIGN KEY(UserID)    
-        REFERENCES User(UserID),
+               REFERENCES User(UserID),
+               
     CONSTRAINT reviewProductFK FOREIGN KEY(ProductID)
-        REFERENCES Product(ProductID),
+			   REFERENCES Product(ProductID),
+               
     CONSTRAINT RatingValues CHECK
-        (Rating > 0 AND Rating <= 5)
+               (Rating > 0 AND Rating <= 5)
 );
 
 CREATE TABLE Inventory (
     InventoryID     INT             NOT NULL AUTO_INCREMENT,
-    ProductID       INT             NOT NULL,
     StoreAvailable  VARCHAR(30)     DEFAULT 'Not Available',
     QuantityOnHand  INT             NOT NULL,
     QuantityOnOrder INT             NOT NULL,
-    CONSTRAINT invenKey PRIMARY KEY(InventoryID),
-    CONSTRAINT inventoryProductFK FOREIGN KEY(ProductID)
-        REFERENCES Product(ProductID)
+    
+    CONSTRAINT invenKey PRIMARY KEY(InventoryID)
 );
 
 CREATE TABLE Orders (
@@ -56,11 +60,37 @@ CREATE TABLE Orders (
     ProductID       INT             NOT NULL,
     Price           NUMERIC(8,2)    NOT NULL,
     DateOfPurchase  DATE            NOT NULL,
+    
     CONSTRAINT purchases PRIMARY KEY(PurchaseID),
+    
     CONSTRAINT ordersUserFK FOREIGN KEY(UserID)
-        REFERENCES User(UserID),
+			   REFERENCES User(UserID),
+        
     CONSTRAINT ordersProductFK FOREIGN KEY(ProductID)
-        REFERENCES Product(ProductID)
+			   REFERENCES Product(ProductID)
+);
+
+CREATE TABLE OrderItem(
+OrderedItemID	INT	 NOT NULL AUTO_INCREMENT,
+PurchaseID		INT  NOT NULL,
+ProductID		INT	  NOT NULL,
+Quantity	    INT   NOT NULL,
+Price			Numeric(8,2) NOT NULL,
+
+CONSTRAINT	orderIID	PRIMARY KEY(OrderedItemID),
+
+CONSTRAINT 	orderFK		FOREIGN KEY(PurchaseID)
+			REFERENCES	Orders(PurchaseID)
+            ON UPDATE	NO ACTION
+            ON DELETE	CASCADE,
+            
+CONSTRAINT	productFK	FOREIGN KEY (ProductID)
+			REFERENCES	Product(ProductID)
+            ON UPDATE	NO ACTION
+            ON DELETE	CASCADE
+            
+
+
 );
 
 CREATE TABLE Game (
@@ -73,11 +103,13 @@ CREATE TABLE Game (
     Company         VARCHAR(30)     NOT NULL,
     YearOfRelease   YEAR            NOT NULL,
     PlayableConsole VARCHAR(40)     NOT NULL,
+    
     CONSTRAINT gamePK PRIMARY KEY(ProductID),
+    
     CONSTRAINT gameProductFK FOREIGN KEY(ProductID)
-        REFERENCES Product(ProductID)
-        ON UPDATE NO ACTION
-        ON DELETE CASCADE
+               REFERENCES Product(ProductID)
+               ON UPDATE NO ACTION
+               ON DELETE CASCADE
 );
 
 CREATE TABLE Console (
@@ -86,13 +118,16 @@ CREATE TABLE Console (
     Conditions      VARCHAR(30)     DEFAULT 'No Information',
     Company         VARCHAR(30)     NOT NULL,
     YearOfRelease   YEAR            NOT NULL,
-    CONSTRAINT consolePK PRIMARY KEY(ProductID),
+    
+    CONSTRAINT consolePK 		PRIMARY KEY(ProductID),
+    
     CONSTRAINT consoleProductFK FOREIGN KEY(ProductID)
-        REFERENCES Product(ProductID)
-        ON UPDATE NO ACTION
-        ON DELETE CASCADE,
+			   REFERENCES Product(ProductID)
+               ON UPDATE NO ACTION
+               ON DELETE CASCADE,
+               
     CONSTRAINT CompanyValues CHECK 
-        (Company IN ('Nintendo', 'Microsoft', 'Sony', 'Atari', 'Bandai', 'Sega', 'Mattel', 'Panasonic', 'PC'))
+               (Company IN ('Nintendo', 'Microsoft', 'Sony', 'Atari', 'Bandai', 'Sega', 'Mattel', 'Panasonic', 'PC'))
 );
 
 CREATE TABLE Store (
@@ -100,9 +135,11 @@ CREATE TABLE Store (
     InventoryID     INT             NOT NULL,
     Address         VARCHAR(60)     NOT NULL,
     PhoneNumber     BIGINT          NOT NULL,
+    
     CONSTRAINT storeInfo PRIMARY KEY(StoreID),
+    
     CONSTRAINT storeInventoryFK FOREIGN KEY(InventoryID)
-        REFERENCES Inventory(InventoryID)
+               REFERENCES Inventory(InventoryID)
 );
 
 CREATE TABLE ConsoleRepair (
@@ -115,11 +152,15 @@ CREATE TABLE ConsoleRepair (
     PriceOfRepair   NUMERIC(8,2)    NOT NULL,
     DateReceived    DATE            NOT NULL,
     DateCompleted   DATE            DEFAULT NULL,
+    
     CONSTRAINT repairInfo PRIMARY KEY(RepairID),
+    
     CONSTRAINT repairUserFK FOREIGN KEY(UserID)
-        REFERENCES User(UserID),
+               REFERENCES User(UserID),
+               
     CONSTRAINT repairProductFK FOREIGN KEY(ProductID)
-        REFERENCES Product(ProductID),
+               REFERENCES Product(ProductID),
+               
     CONSTRAINT repairConsoleFK FOREIGN KEY(ConsoleID) 
-        REFERENCES Console(ProductID)  
+               REFERENCES Console(ProductID)  
 );
