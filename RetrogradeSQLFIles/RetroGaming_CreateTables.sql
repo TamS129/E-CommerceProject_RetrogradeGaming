@@ -1,6 +1,6 @@
-CREATE DATABASE retrogradeGaming;
+CREATE DATABASE retrogradegaming;
 
-USE retrogradeGaming;
+USE retrogradegaming;
 
 CREATE TABLE User (
     UserID          INT             NOT NULL AUTO_INCREMENT,
@@ -39,7 +39,9 @@ CREATE TABLE Review (
                REFERENCES User(UserID),
                
     CONSTRAINT reviewProductFK FOREIGN KEY(ProductID)
-			   REFERENCES Product(ProductID),
+			   REFERENCES Product(ProductID)
+						 ON UPDATE NO ACTION
+                         ON DELETE CASCADE,
                
     CONSTRAINT RatingValues CHECK
                (Rating > 0 AND Rating <= 5)
@@ -47,11 +49,16 @@ CREATE TABLE Review (
 
 CREATE TABLE Inventory (
     InventoryID     INT             NOT NULL AUTO_INCREMENT,
+    ProductID		INT				NOT NULL,
     StoreAvailable  VARCHAR(30)     DEFAULT 'Not Available',
     QuantityOnHand  INT             NOT NULL,
     QuantityOnOrder INT             NOT NULL,
     
-    CONSTRAINT invenKey PRIMARY KEY(InventoryID)
+    CONSTRAINT invenKey PRIMARY KEY(InventoryID),
+    CONSTRAINT productID FOREIGN KEY(ProductID)
+						 REFERENCES Product(ProductID)
+                         ON UPDATE NO ACTION
+                         ON DELETE CASCADE
 );
 
 CREATE TABLE Orders (
@@ -64,10 +71,14 @@ CREATE TABLE Orders (
     CONSTRAINT purchases PRIMARY KEY(PurchaseID),
     
     CONSTRAINT ordersUserFK FOREIGN KEY(UserID)
-			   REFERENCES User(UserID),
+			   REFERENCES User(UserID)
+               ON UPDATE NO ACTION
+               ON DELETE CASCADE,
         
     CONSTRAINT ordersProductFK FOREIGN KEY(ProductID)
 			   REFERENCES Product(ProductID)
+               ON UPDATE NO ACTION
+               ON DELETE CASCADE
 );
 
 CREATE TABLE OrderItem(
@@ -102,7 +113,6 @@ CREATE TABLE Game (
     Description     VARCHAR(60),
     Company         VARCHAR(30)     NOT NULL,
     YearOfRelease   YEAR            NOT NULL,
-    PlayableConsole VARCHAR(40)     NOT NULL,
     
     CONSTRAINT gamePK PRIMARY KEY(ProductID),
     
@@ -140,6 +150,8 @@ CREATE TABLE Store (
     
     CONSTRAINT storeInventoryFK FOREIGN KEY(InventoryID)
                REFERENCES Inventory(InventoryID)
+               ON UPDATE NO ACTION
+               ON DELETE CASCADE
 );
 
 CREATE TABLE ConsoleRepair (
